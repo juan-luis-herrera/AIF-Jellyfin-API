@@ -18,8 +18,8 @@ For proper testing, you may also want to create automated clients.
     -  `JellyfinAPI`: Tests for the Jellyfin API,
 - `jellyfin_conf`: Jellyfin configuration, provided empty for security reasons. **Create this directory if it does not exist**.
 - `jelllyfin_data`: Media for Jellyfin to stream, provided empty for data size and copyright reasons. **Create this directory if it does not exist**.
-    - `music`: Music files. Refer to the setup details below to replicate the experiment, or add your own.
-    - `movies`: Video files. Refer to the setup details below to replicate the experiment, or add your own.
+    - `music`: Music files. Refer to the setup details below to replicate the experiment, or add your own. **Create this directory if it does not exist**.
+    - `movies`: Video files. Refer to the setup details below to replicate the experiment, or add your own. **Create this directory if it does not exist**.
 - `docker-compose-jellyfin-test.yaml`: Docker Compose specification for the scenario.
 - `ServiceAPIExample.yml`: Example declaration of the Service API using the OpenAPI specification.
 - `README.md`: Current file
@@ -45,9 +45,9 @@ For proper testing, you may also want to create automated clients.
     - Saint-Saens - Carnival of the Animals - 07 - Aquarium
     - Saint-Saens - Carnival of the Animals - 12 - Fossiles (Fossils)
 - Movies: Public Domain movies, legally obtained from Wikipedia in WEBM format. Specifically:
-    - Night of the Living Dead (1968)
-    - Popeye The Sailor - Aladding and His Wonderful Lamp (1939)
-    - The Emperor Jones (1933) by Dudley Murphy
+    - [Night of the Living Dead (1968)](https://en.wikipedia.org/wiki/File:Night_of_the_Living_Dead_(1968).webm)
+    - [Popeye The Sailor - Aladding and His Wonderful Lamp (1939)](https://en.wikipedia.org/wiki/File:Popeye_The_Sailor_-_Aladdin_and_His_Wonderful_Lamp_(1939).webm)
+    - [The Emperor Jones (1933) by Dudley Murphy](https://en.wikipedia.org/wiki/File:The_Emperor_Jones_(1933)_by_Dudley_Murphy.webm)
 
 ### Instructions
 
