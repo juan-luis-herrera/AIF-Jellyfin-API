@@ -1,7 +1,7 @@
 services:
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
-    container_name: jellyfin
+    container_name: media-server
     environment:
       - PUID=1000
       - PGID=1000
@@ -14,10 +14,25 @@ services:
       - 8920:8920
       - 7359:7359/udp
       - 1900:1900/udp
-  telemetry:
+  mosquitto:
     image: eclipse-mosquitto
-    container_name: telemetry
+    container_name: telemetry-broker
     volumes:
       - ./telemetry_conf:/mosquitto/config
     ports:
       - 1883:1883
+  influxdb:
+    image: influxdb:2
+    container_name: telemetry-db
+    ports:
+      - 8086:8086
+    volumes:
+      - ./influxdb_data:/var/lib/influxdb2
+      - ./influxdb_conf:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=tuwiendsg
+      - DOCKER_INFLUXDB_INIT_PASSWORD=tuwiendsg
+      - DOCKER_INFLUXDB_INIT_ORG=tuwien
+      - DOCKER_INFLUXDB_INIT_BUCKET=telemetry
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=december
