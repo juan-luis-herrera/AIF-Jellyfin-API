@@ -14,21 +14,22 @@ For proper testing, you may also want to create automated clients.
 
 ## Repository structure
 
-- `Bruno`: API tests using the open-source [Bruno](https://www.usebruno.com/) tool.
-    -  `JellyfinAPI`: Tests for the Jellyfin API,
 - `jellyfin_conf`: Jellyfin configuration, provided empty for security reasons. **Create this directory if it does not exist**.
 - `jelllyfin_data`: Media for Jellyfin to stream, provided empty for data size and copyright reasons. **Create this directory if it does not exist**.
+- `telemetry_conf`: Configuration directory for the MQTT telemetry broker. This broker is used to get QoS information from the client side that is not directly obtained by the server.
+    - `mosquitto.conf`: Configuration for the Mosquitto MQTT broker.
     - `music`: Music files. Refer to the setup details below to replicate the experiment, or add your own. **Create this directory if it does not exist**.
     - `movies`: Video files. Refer to the setup details below to replicate the experiment, or add your own. **Create this directory if it does not exist**.
 - `docker-compose-jellyfin-test.yaml`: Docker Compose specification for the scenario.
 - `ServiceAPIExample.yml`: Example declaration of the Service API using the OpenAPI specification.
 - `README.md`: Current file
 
-## Setup details (for replicability)
+## Setup details
 
 ### Tools and data used
 
-- Tool used to generate the basis of the Service API: openapi-generator 7.14.0-1 (installed via pacman)
+- Tool used to generate the basis of the Service API: `openapi-generator` 7.14.0-1 ([Arch Linux package](https://archlinux.org/packages/extra/any/openapi-generator/))
+- Tool used to manage the container deployment: `docker-compose` 2.39.2-1 ([Arch Linux package](https://archlinux.org/packages/extra/x86_64/docker-compose/))
 - Music: Royalty-free, legally obtained from [Classicals.de](https://classicals.de) in MP3 format. Specifically:
     - Bach - Air on the G String - BWV 1068 - Arranged for Woodwinds and Strings
     - Beethoven - Für Elise - Bagatelle No. 25 - WoO 59

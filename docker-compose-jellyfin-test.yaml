@@ -14,3 +14,10 @@ services:
       - 8920:8920
       - 7359:7359/udp
       - 1900:1900/udp
+  telemetry:
+    image: eclipse-mosquitto
+    container_name: telemetry
+    volumes:
+      - ./telemetry_conf:/mosquitto/config
+    ports:
+      - 1883:1883
