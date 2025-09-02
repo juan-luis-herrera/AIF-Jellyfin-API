@@ -26,18 +26,20 @@ class MQTTHook:
         self.LOGGER = logging.getLogger(__name__)
         self.LOGGER.debug("MQTT hook created")
 
-    @staticmethod
-    def _connect_handling(client, userdata, flags, rc, properties):
+    def _connect_handling(self, client, userdata, flags, rc, properties):
         if rc != 0:
             raise MQTTError(f"Error on MQTT connection, code {rc}")
         else:
             client.subscribe(config.MQTT_TOPIC)
-            self.LOGGER.info("MQTT connection successful")
+            self.LOGGER.info("MQTT connection and subscription successful")
     
-    @staticmethod
-    def _message_handling(client, userdata, message):
+    def _message_handling(self, client, userdata, message):
         try:
-            message = json.loads(str(message.payload))
+            self.LOGGER.debug(f"Got message - Payload size {len(message.payload)}")
+            raw_message = message.payload
+            str_message = raw_message.decode("utf-8")
+            self.LOGGER.debug(f"UTF-8 message: {str_message}")
+            message = json.loads(str_message)
             self.LOGGER.debug("Successfully unmarshalled message")
             message["Time (UTC)"] = datetime.strptime(message["Time (UTC)"], config.DATETIME_FORMAT_STRING).replace(tzinfo=ZoneInfo("Etc/UTC"))
             res = True
@@ -51,9 +53,10 @@ class MQTTHook:
             self.LOGGER.error(f"Error in message handling: {str(err)}")
     
     def hook(self) -> None:
+        self.LOGGER.info("Starting execution loop")
         self._mqtt_client.loop_forever()
 
-    def __enter__(self) -> MQTTHook:
+    def __enter__(self):
         try:
             for conn in self._database_connectors:
                 res = conn.start()
@@ -68,6 +71,7 @@ class MQTTHook:
             self.LOGGER.error("Error during MQTT connection: refused")
         except MQTTError as err:
             self.LOGGER.error(f"Error during MQTT connection: {str(err)}")
+        return self
 
     def __exit__(self, *exc):
         self.LOGGER.debug("Stopping hook...")

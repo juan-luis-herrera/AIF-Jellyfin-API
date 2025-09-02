@@ -36,3 +36,10 @@ services:
       - DOCKER_INFLUXDB_INIT_ORG=tuwien
       - DOCKER_INFLUXDB_INIT_BUCKET=telemetry
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=december
+  hook:
+    build:
+      context: mqtt_hook
+      dockerfile: Dockerfile
+    environment:
+      - MQTT_BROKER=mosquitto
+      - INFLUX_URL=http://influxdb:8086

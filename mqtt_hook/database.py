@@ -36,7 +36,7 @@ class InfluxDBConnector(DatabaseConnector):
 
     def start(self) -> bool:
         try:
-            self._write_client = influxdb_client.InfluxDBClient(url=self._url, token=self._token, org=self._org)
+            self._write_client = InfluxDBClient(url=self._url, token=self._token, org=self._org)
             self.LOGGER.info(f"Connected successfully to InfluxDB@{self._url}")
             return True
         except Exception as err:
@@ -56,7 +56,9 @@ class InfluxDBConnector(DatabaseConnector):
                     "ID", data_to_store.get("Autowatcher ID", "UNKNOWN")
                 ).field(
                     "Dropped frames", data_to_store.get("Dropped frames", 0)).field(
-                    "Corrupted frames", data_to_store.get("Corrupted frames", 0)).time(
+                    "Corrupted frames", data_to_store.get("Corrupted frames", 0)).field(
+                    "Transcoding FPS", data_to_store.get("Transcoding FPS", 30)).field(
+                    "Transcoding rate", data_to_store.get("Transcoding rate", 1)).time(
                         data_to_store.get("Time (UTC)", datetime.now().astimezone(ZoneInfo("Etc/UTC")))
                     )
                 write_api.write(bucket=self._bucket, org=self._org, record=point)
