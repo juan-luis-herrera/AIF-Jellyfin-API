@@ -12,9 +12,6 @@ MQTT_CLIENT_ID = os.getenv("MQTT_CLIENT_ID", default="media-server-api")
 MQTT_TOPIC = os.getenv("MQTT_TOPIC", default="autowatcher/reporting")
 """Topic to subscribe to for data gathering"""
 
-DATETIME_FORMAT_STRING = os.getenv("DATETIME_FORMAT_STRING", default="%Y-%m-%d %H:%M:%S")
-"""Format string for datetimes"""
-
 INFLUX_URL = os.getenv("INFLUX_URL", default="http://localhost:8086")
 """URL to connect to InfluxDBv2 (as a telemetry database)"""
 
@@ -27,5 +24,5 @@ INFLUX_ORG = os.getenv("INFLUX_ORG", default="tuwien")
 INFLUX_BUCKET = os.getenv("INFLUX_BUCKET", default="telemetry")
 """Bucket to write data to in InfluxDB"""
 
-INFLUX_MEASUREMENT = os.getenv("INFLUX_MEASUREMENT", default="jellyfin-qos")
-"""Measurement for data stored in InfluxDB"""
+CONFIG_FILE = os.getenv("CONFIG_FILE", default="mqtt_hook/confs/jellyfin-qos.json")
+"""File to configure the MQTT hook"""

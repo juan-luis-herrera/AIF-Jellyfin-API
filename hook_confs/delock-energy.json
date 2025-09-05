@@ -1,0 +1,62 @@
+{
+    "measurement": "delock-energy",
+    "tags": [
+        {
+            "name": "$TOPIC",
+            "label": "Machine",
+            "default": "UNKNOWN"
+        }
+    ],
+    "fields": [
+        {
+            "name": "ENERGY/Total",
+            "label": "Total",
+            "default": 0
+        },
+        {
+            "name": "ENERGY/Today",
+            "label": "Today",
+            "default": 0
+        },
+        {
+            "name": "ENERGY/Period",
+            "label": "Period",
+            "default": 0
+        },
+        {
+            "name": "ENERGY/Power",
+            "label": "Power",
+            "default": 0
+        },
+        {
+            "name": "ENERGY/ApparentPower",
+            "label": "Apparent power",
+            "default": 0
+        },
+        {
+            "name": "ENERGY/ReactivePower",
+            "label": "Reactive power",
+            "default": 0
+        },
+        {
+            "name": "ENERGY/Factor",
+            "label": "Factor",
+            "default": 0
+        },
+        {
+            "name": "ENERGY/Voltage",
+            "label": "Voltage",
+            "default": 226
+        },
+        {
+            "name": "ENERGY/Current",
+            "label": "Current",
+            "default": 0
+        }
+    ],
+    "time": {
+        "name": "Time",
+        "format": "%Y-%m-%dT%H:%M:%S",
+        "timezone": "Europe/Vienna"
+    }
+}

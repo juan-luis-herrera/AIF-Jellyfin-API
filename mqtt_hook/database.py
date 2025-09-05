@@ -1,7 +1,14 @@
 from abc import ABC, abstractmethod
+from interpret import MessageInterpreter, MessageInterpreterInflux
+
+from paho.mqtt.client import MQTTMessage
 
 class DatabaseConnector(ABC):
 
+    @abstractmethod
+    def __init__(self, interpreter: MessageInterpreter):
+        pass
+    
     @abstractmethod
     def start(self) -> bool:
         pass
@@ -11,7 +18,7 @@ class DatabaseConnector(ABC):
         pass
 
     @abstractmethod
-    def store(self, data_to_store: dict) -> bool:
+    def store(self, message: MQTTMessage) -> bool:
         pass
 
 import config
@@ -25,7 +32,8 @@ import logging
 
 class InfluxDBConnector(DatabaseConnector):
 
-    def __init__(self):
+    def __init__(self, interpreter: MessageInterpreterInflux):
+        self._interpreter = interpreter
         self._token = config.INFLUX_TOKEN
         self._org = config.INFLUX_ORG
         self._url = config.INFLUX_URL
@@ -47,20 +55,10 @@ class InfluxDBConnector(DatabaseConnector):
         self._write_client.close()
         self.LOGGER.info("InfluxDB connection closed")
 
-    def store(self, data_to_store: dict) -> bool:
+    def store(self, message: MQTTMessage) -> bool:
         try:
             with self._write_client.write_api(write_options=SYNCHRONOUS) as write_api:
-                point = Point(
-                    config.INFLUX_MEASUREMENT
-                ).tag(
-                    "ID", data_to_store.get("Autowatcher ID", "UNKNOWN")
-                ).field(
-                    "Dropped frames", data_to_store.get("Dropped frames", 0)).field(
-                    "Corrupted frames", data_to_store.get("Corrupted frames", 0)).field(
-                    "Transcoding FPS", data_to_store.get("Transcoding FPS", 30)).field(
-                    "Transcoding rate", data_to_store.get("Transcoding rate", 1)).time(
-                        data_to_store.get("Time (UTC)", datetime.now().astimezone(ZoneInfo("Etc/UTC")))
-                    )
+                point = self._interpreter.interpret_message(message)
                 write_api.write(bucket=self._bucket, org=self._org, record=point)
                 self.LOGGER.debug("Successfully wrote point to InfluxDB")
                 return True

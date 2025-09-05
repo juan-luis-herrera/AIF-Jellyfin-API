@@ -36,10 +36,25 @@ services:
       - DOCKER_INFLUXDB_INIT_ORG=tuwien
       - DOCKER_INFLUXDB_INIT_BUCKET=telemetry
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=december
-  hook:
+  qos-hook:
     build:
       context: mqtt_hook
       dockerfile: Dockerfile
     environment:
       - MQTT_BROKER=mosquitto
       - INFLUX_URL=http://influxdb:8086
+      - CONFIG_FILE=/confs/jellyfin-qos.json
+    volumes:
+      -  ./hook_confs:/confs:ro
+  nrg-hook:
+    build:
+      context: mqtt_hook
+      dockerfile: Dockerfile
+    environment:
+      - MQTT_BROKER=mosquitto
+      - INFLUX_URL=http://influxdb:8086
+      - MQTT_CLIENT_ID=nrg-hook
+      - MQTT_TOPIC=energy/+/SENSOR
+      - CONFIG_FILE=/confs/delock-energy.json
+    volumes:
+      - ./hook_confs:/confs:ro

@@ -36,12 +36,6 @@ class MQTTHook:
     def _message_handling(self, client, userdata, message):
         try:
             self.LOGGER.debug(f"Got message - Payload size {len(message.payload)}")
-            raw_message = message.payload
-            str_message = raw_message.decode("utf-8")
-            self.LOGGER.debug(f"UTF-8 message: {str_message}")
-            message = json.loads(str_message)
-            self.LOGGER.debug("Successfully unmarshalled message")
-            message["Time (UTC)"] = datetime.strptime(message["Time (UTC)"], config.DATETIME_FORMAT_STRING).replace(tzinfo=ZoneInfo("Etc/UTC"))
             res = True
             for conn in self._database_connectors:
                 res = res and conn.store(message)
@@ -58,10 +52,10 @@ class MQTTHook:
 
     def __enter__(self):
         try:
-            for conn in self._database_connectors:
+            for idx, conn in enumerate(self._database_connectors):
                 res = conn.start()
                 if res:
-                    self.LOGGER.info(f"Successfully started database connector {str(res)}")
+                    self.LOGGER.info(f"Successfully started database connector {idx+1}")
                 else:
                     self._database_connectors.remove(conn)
                     self.LOGGER.warn(f"Connector {str(res)} failed - removed from list")
@@ -82,9 +76,10 @@ class MQTTHook:
 
 if __name__ == '__main__':
     from database import InfluxDBConnector
+    from interpret import MessageInterpreterJSONInflux
     logging.basicConfig(level=logging.DEBUG, format=LOG_FORMAT)
     connectors = [
-        InfluxDBConnector()
+        InfluxDBConnector(MessageInterpreterJSONInflux(config.CONFIG_FILE))
     ]
     with MQTTHook(connectors) as hook:
         hook.hook()
