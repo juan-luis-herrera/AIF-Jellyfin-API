@@ -68,6 +68,8 @@ class MessageInterpreterJSONInflux(MessageInterpreterInflux):
             dt = datetime.strptime(time_str, time_conf["format"])
             if "timezone" in time_conf:
                 dt.replace(tzinfo=ZoneInfo(time_conf["timezone"]))
+            else:
+                dt.replace(tzinfo=ZoneInfo("Europe/Vienna"))
         else:
             dt = datetime.now()
         utc_dt = dt.astimezone(ZoneInfo("Etc/UTC"))
