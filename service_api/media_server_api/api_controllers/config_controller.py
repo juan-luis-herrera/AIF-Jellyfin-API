@@ -5,8 +5,7 @@ from typing import Union
 
 from media_server_api.models.conf_param import ConfParam  # noqa: E501
 from media_server_api.models.conf_param_value import ConfParamValue  # noqa: E501
-from media_server_api import util
-
+from media_server_api import util, api_bridge
 
 def config_change(conf_param, body=None):  # noqa: E501
     """Change parameter.
@@ -21,9 +20,13 @@ def config_change(conf_param, body=None):  # noqa: E501
     :rtype: Union[None, Tuple[None, int], Tuple[None, int, Dict[str, str]]
     """
     conf_param_value = body
-    if connexion.request.is_json:
-        conf_param_value = ConfParamValue.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+    if conf_param in api_bridge.CONTROLLER.discover_configuration():
+        if api_bridge.CONTROLLER.set_param_value(conf_param, conf_param_value):
+            return "", 200
+        else:
+            return "Invalid value for the parameter", 400
+    else:
+        return "The requested parameter does not exist", 404
 
 
 def config_describe(conf_param):  # noqa: E501
@@ -36,7 +39,11 @@ def config_describe(conf_param):  # noqa: E501
 
     :rtype: Union[ConfParam, Tuple[ConfParam, int], Tuple[ConfParam, int, Dict[str, str]]
     """
-    return 'do some magic!'
+    description = api_bridge.CONTROLLER.describe_param(conf_param)
+    if description is not None:
+        return description, 200
+    else:
+        return "The requested parameter does not exist", 404
 
 
 def config_discover():  # noqa: E501
@@ -47,7 +54,7 @@ def config_discover():  # noqa: E501
 
     :rtype: Union[List[str], Tuple[List[str], int], Tuple[List[str], int, Dict[str, str]]
     """
-    return 'do some magic!'
+    return api_bridge.CONTROLLER.discover_configuration(), 200
 
 
 def config_value(conf_param):  # noqa: E501
@@ -60,4 +67,8 @@ def config_value(conf_param):  # noqa: E501
 
     :rtype: Union[ConfParamValue, Tuple[ConfParamValue, int], Tuple[ConfParamValue, int, Dict[str, str]]
     """
-    return 'do some magic!'
+    value = api_bridge.CONTROLLER.get_param_value(conf_param)
+    if value is not None:
+        return value, 200
+    else:
+        return "The requested parameter does not exist", 404

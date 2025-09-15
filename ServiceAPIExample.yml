@@ -1,4 +1,4 @@
-openapi: '3.1.1'
+openapi: '3.0.4'
 info:
   title: Service API
   version: 'research-0.1'
@@ -337,12 +337,7 @@ components:
       oneOf:
         - type: boolean
         - type: number
-        - type: integer
         - type: string
-        - type: string
-          format: date
-        - type: string
-          format: date-time
     ConfParam:
       type: object
       properties:
@@ -493,13 +488,4 @@ components:
       oneOf:
         - type: boolean
         - type: number
-        - type: integer
         - type: string
-        - type: string
-          format: date
-        - type: string
-          format: date-time
-        - type: string
-          format: byte
-        - type: string
-          format: binary

@@ -46,6 +46,9 @@ services:
       - CONFIG_FILE=/confs/jellyfin-qos.json
     volumes:
       -  ./hook_confs:/confs:ro
+    depends_on:
+      - influxdb
+      - mosquitto
   nrg-hook:
     build:
       context: mqtt_hook
@@ -58,3 +61,6 @@ services:
       - CONFIG_FILE=/confs/delock-energy.json
     volumes:
       - ./hook_confs:/confs:ro
+    depends_on:
+      - influxdb
+      - mosquitto

@@ -1,5 +1,5 @@
 inputSpec: ServiceAPIExample.yml
-outputDir: media_server_api_implementation
+outputDir: service_api
 generatorName: python-flask
 controllerPackage: api_controllers
 defaultController: api_controller
