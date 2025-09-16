@@ -6,6 +6,7 @@ from media_server_api.models.range_slo import RangeSLO
 from media_server_api.models.integer_range_slo import IntegerRangeSLO
 from media_server_api.models.date_range_slo import DateRangeSLO
 from media_server_api.models.date_time_range_slo import DateTimeRangeSLO
+import logging
 
 
 class SLOParser(ABC):
@@ -31,6 +32,7 @@ class JSONSLOParser(SLOParser):
         "date_target_value": SLOType.DATE_TARGET_VALUE,
         "datetime_target_value": SLOType.DATETIME_TARGET_VALUE
     }
+    _LOGGER = logging.getLogger("gunicorn.error")
 
     @staticmethod
     def _build_description(slo_type: SLOType, description) -> bool|RangeSLO|IntegerRangeSLO|DateRangeSLO|DateTimeRangeSLO|float|int|str|date|datetime:
@@ -49,14 +51,18 @@ class JSONSLOParser(SLOParser):
 
     @classmethod
     def parse_slo_file(cls, slo_file: str) -> dict[str, (SLO, str)]:
+        cls._LOGGER.debug("Parsing SLO configuration")
         with open(slo_file, 'r') as in_json:
             slo_list = json.load(in_json)
         slos = {}
         queries = {}
         for unparsed_slo in slo_list:
+            cls._LOGGER.debug(f"Parsing SLO {unparsed_slo["id"]}")
             query = unparsed_slo.pop(cls._QUERY_KEY)
             slo_type = cls._TYPE_PARSING[unparsed_slo["type"]]
             slo = SLO(id=unparsed_slo["id"], name=unparsed_slo["name"], type=slo_type, description=cls._build_description(slo_type, unparsed_slo["description"]))
             slos[unparsed_slo[cls._ID_KEY]] = slo
             queries[unparsed_slo[cls._ID_KEY]] = query
+            cls._LOGGER.debug("SLO parsed successfully")
+        cls._LOGGER.info(f"SLO configuration parsed successfully. {len(slos)} SLOs parsed")
         return slos, queries

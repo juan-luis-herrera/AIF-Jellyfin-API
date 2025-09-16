@@ -1,4 +1,5 @@
 from datetime import datetime, date
+import logging
 
 from requests import Session
 from media_server_api.service_controller import ServiceController, ControlException
@@ -78,6 +79,8 @@ class JellyfinController(ServiceController):
     def __enter__(self):
         self._session = Session()
         self._session.headers.update({"Authorization": f'MediaBrowser Token="{config.JELLYFIN_API_KEY}"'})
+        self._logger = logging.getLogger("gunicorn.error")
+        self._logger.info("Jellyfin controller started")
         return self
 
     def _check_range(self, param_definition: ConfParam, param_value) -> bool:
@@ -122,9 +125,13 @@ class JellyfinController(ServiceController):
             return False
 
     def discover_configuration(self) -> list[str]:
+        self._logger.debug("Configuration discovery called")
         return sorted(list(self._CONFIGURATION_PARAMS.keys()))
 
     def describe_param(self, param_id: str) -> ConfParam|None:
+        self._logger.debug(f"Param description for {param_id} requested")
+        if param_id not in self._CONFIGURATION_PARAMS:
+            self._logger.warning(f"Param {param_id} does not exist")
         return self._CONFIGURATION_PARAMS.get(param_id)
 
     def set_param_value(self, param_id: str, param_value) -> bool:
@@ -133,18 +140,30 @@ class JellyfinController(ServiceController):
         # This also rejects setting undeclared params
         if isinstance(param_value, str) and ((param_value[0] == '"' and param_value[-1] == '"') or (param_value[0] == "'" and param_value[-1] == "'")):
             param_value = param_value[1:-1] # Remove starting-trailing quotes
+        self._logger.debug(f"Trying to set value of {param_id} to {param_value}")
         valid = self._validate_param(self._CONFIGURATION_PARAMS[param_id], param_value)
+        self._logger.debug("Value validation passed")
         if valid:
             valid = self._call_param_update(param_id, param_value)
+            if valid:
+                self._logger.info(f"{param_id} updated successfully")
+            else:
+                self._logger.error(f"Error on updating {param_id} to {param_value}")
         return valid
 
-    def _call_param_update(self, param_id: str, param_value) -> bool: # TODO implement
+    def _call_param_update(self, param_id: str, param_value) -> bool:
         return self._session.post(f"{config.JELLYFIN_URL}{self._API_ENDPOINTS[self._TRANSCODING_KEY]}", json={param_id: param_value}).ok
 
     def get_param_value(self, param_id: str):
+        self._logger.debug(f"Querying for param {param_id}")
         if param_id in self._CONFIGURATION_PARAMS: # Security hole otherwise - Undeclared params could be queried
             param_val = self._call_param_get(param_id)
+            if param_val is not None:
+                self._logger.info(f"{param_id} retrieved successfully")
+            else:
+                self._logger.error(f"Error retrieving {param_id}")
         else:
+            self._logger.warning(f"{param_id} does not exist")
             param_val = None
         return param_val
 
@@ -153,9 +172,12 @@ class JellyfinController(ServiceController):
         if transcoding_req.ok and 'json' in transcoding_req.headers.get("content-type", ''):
             transcoding_conf = transcoding_req.json()
             return transcoding_conf.get(param_id)
+        else:
+            return None
 
     def check_connectivity(self) -> int:
         return self._session.get(f"{config.JELLYFIN_URL}{self._API_ENDPOINTS[self._CONNECTIVITY_KEY]}").status_code
     
     def __exit__(self, *exc):
         self._session.close()
+        self._logger.info("Jellyfin controller stopped")
