@@ -1,0 +1,14 @@
+[
+    {
+        "id": "meanFPS",
+        "name": "Mean transcoding FPS achieved in the last 5 minutes",
+        "type": "range",
+        "description": {
+            "min_value": 24,
+            "max_value": 31,
+            "min_range": 0,
+            "max_range": 140
+        },
+        "query": "|> range(start: -5m)  |>filter(fn: (r) => r[\"_measurement\"] == \"jellyfin-qos\")  |>group(columns: [\"_field\"], mode: \"by\")  |> filter(fn: (r) => r[\"_field\"] == \"Transcoding FPS\")  |> mean()"
+    }
+]

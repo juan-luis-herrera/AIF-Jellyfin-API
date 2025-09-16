@@ -13,4 +13,5 @@ python_dateutil >= 2.6.0
 flask-cors >= 3.0.10
 setuptools >= 21.0.0
 Flask == 2.1.1
-requests
+requests == 2.32.5
+influxdb-client == 1.49.0

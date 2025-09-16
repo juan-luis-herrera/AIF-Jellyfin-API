@@ -5,20 +5,24 @@ from flask_cors import CORS
 
 from media_server_api import encoder, api_bridge
 from media_server_api.service_controller.jellyfin import JellyfinController
+from media_server_api.slo_controller import InfluxDBSLOController
+from media_server_api.slo_controller.parser import JSONSLOParser
 
 def main():
     with JellyfinController() as controller:
-        api_bridge.CONTROLLER = controller
-        app = connexion.App(__name__, specification_dir='./openapi/')
-        app.app.json_encoder = encoder.JSONEncoder
-        app.add_api('openapi.yaml',
-                    arguments={'title': 'Service API'},
-                    pythonic_params=True)
+        api_bridge.SERVICE_CONTROLLER = controller
+        with InfluxDBSLOController(JSONSLOParser) as slo_controller:
+            api_bridge.SLO_CONTROLLER = slo_controller
+            app = connexion.App(__name__, specification_dir='./openapi/')
+            app.app.json_encoder = encoder.JSONEncoder
+            app.add_api('openapi.yaml',
+                        arguments={'title': 'Service API'},
+                        pythonic_params=True)
 
-        # add CORS support
-        CORS(app.app)
+            # add CORS support
+            CORS(app.app)
 
-        app.run(port=8080)
+            app.run(port=8080)
 
 
 if __name__ == '__main__':

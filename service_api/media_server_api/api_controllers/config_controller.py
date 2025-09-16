@@ -20,8 +20,8 @@ def config_change(conf_param, body=None):  # noqa: E501
     :rtype: Union[None, Tuple[None, int], Tuple[None, int, Dict[str, str]]
     """
     conf_param_value = body
-    if conf_param in api_bridge.CONTROLLER.discover_configuration():
-        if api_bridge.CONTROLLER.set_param_value(conf_param, conf_param_value):
+    if conf_param in api_bridge.SERVICE_CONTROLLER.discover_configuration():
+        if api_bridge.SERVICE_CONTROLLER.set_param_value(conf_param, conf_param_value):
             return "", 200
         else:
             return "Invalid value for the parameter", 400
@@ -39,7 +39,7 @@ def config_describe(conf_param):  # noqa: E501
 
     :rtype: Union[ConfParam, Tuple[ConfParam, int], Tuple[ConfParam, int, Dict[str, str]]
     """
-    description = api_bridge.CONTROLLER.describe_param(conf_param)
+    description = api_bridge.SERVICE_CONTROLLER.describe_param(conf_param)
     if description is not None:
         return description, 200
     else:
@@ -54,7 +54,7 @@ def config_discover():  # noqa: E501
 
     :rtype: Union[List[str], Tuple[List[str], int], Tuple[List[str], int, Dict[str, str]]
     """
-    return api_bridge.CONTROLLER.discover_configuration(), 200
+    return api_bridge.SERVICE_CONTROLLER.discover_configuration(), 200
 
 
 def config_value(conf_param):  # noqa: E501
@@ -67,7 +67,7 @@ def config_value(conf_param):  # noqa: E501
 
     :rtype: Union[ConfParamValue, Tuple[ConfParamValue, int], Tuple[ConfParamValue, int, Dict[str, str]]
     """
-    value = api_bridge.CONTROLLER.get_param_value(conf_param)
+    value = api_bridge.SERVICE_CONTROLLER.get_param_value(conf_param)
     if value is not None:
         return value, 200
     else:

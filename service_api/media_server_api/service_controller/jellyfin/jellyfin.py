@@ -2,11 +2,12 @@ from datetime import datetime, date
 
 from requests import Session
 from media_server_api.service_controller import ServiceController, ControlException
-from media_server_api import config
+from media_server_api.service_controller.jellyfin import config
 from media_server_api.models.conf_param import ConfParam
 from media_server_api.models.conf_param_type import ConfParamType
 from media_server_api.models.conf_param_description import ConfParamDescription
 from media_server_api.models.integer_range_conf_param import IntegerRangeConfParam
+
 
 class JellyfinController(ServiceController):
     _TRANSCODING_KEY = "Transcoding"
