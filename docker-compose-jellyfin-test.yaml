@@ -42,7 +42,13 @@ services:
       dockerfile: Dockerfile
     environment:
       - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - MQTT_CLIENT_ID=media-server-api
+      - MQTT_TOPIC=autowatcher/reporting
       - INFLUX_URL=http://influxdb:8086
+      - INFLUX_TOKEN=december
+      - INFLUX_ORG=tuwien
+      - INFLUX_BUCKET=telemetry
       - CONFIG_FILE=/confs/jellyfin-qos.json
     volumes:
       -  ./hook_confs:/confs:ro
@@ -55,7 +61,11 @@ services:
       dockerfile: Dockerfile
     environment:
       - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
       - INFLUX_URL=http://influxdb:8086
+      - INFLUX_TOKEN=december
+      - INFLUX_ORG=tuwien
+      - INFLUX_BUCKET=telemetry
       - MQTT_CLIENT_ID=nrg-hook
       - MQTT_TOPIC=energy/+/SENSOR
       - CONFIG_FILE=/confs/delock-energy.json
@@ -64,3 +74,25 @@ services:
     depends_on:
       - influxdb
       - mosquitto
+  service-api:
+    build:
+      context: service_api
+      dockerfile: Dockerfile
+    environment:
+      - SLO_FILE=/confs/qos.json
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_TOKEN=december
+      - INFLUX_ORG=tuwien
+      - INFLUX_BUCKET=telemetry
+      - JELLYFIN_URL=http://jellyfin:8096
+      - JELLYFIN_API_KEY=f040763a24b74e99bae5f30d15215c68
+      - WORKERS=1
+      - LISTEN_HOST=0.0.0.0
+      - LOG_LEVEL=debug
+    ports:
+      - 8080:80
+    volumes:
+      - ./slo_confs:/confs:ro
+    depends_on:
+      - jellyfin
+      - influxdb

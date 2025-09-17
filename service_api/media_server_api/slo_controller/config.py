@@ -6,7 +6,7 @@ SLO_FILE = os.getenv("SLO_FILE", default="slos.json")
 INFLUX_URL = os.getenv("INFLUX_URL", default="http://localhost:8086")
 """URL to connect to InfluxDBv2 (as a telemetry database)"""
 
-INFLUX_TOKEN = os.getenv("INFLUX_TOKEN", default="nSDsQp9hnVDKOheerHe3ZGbdXhQgAR8IajVJt356xkXQ-SC1vxB4w75NCWTkrMi27t-OsBcVNRwBK4M2jiCWxQ==")
+INFLUX_TOKEN = os.getenv("INFLUX_TOKEN", default="december")
 """Token for authenticating with InfluxDB (as a telemetry database)"""
 
 INFLUX_ORG = os.getenv("INFLUX_ORG", default="tuwien")

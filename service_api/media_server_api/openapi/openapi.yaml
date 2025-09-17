@@ -6,7 +6,7 @@ externalDocs:
   description: Read the paper on this specification
   url: https://doi.org/ADD-THE-DOI-HERE-ONCE-WE-HAVE-IT
 servers:
-- url: https://apitest:1225/v0
+- url: https://apitest:80/v0
 tags:
 - description: Endpoints related to SLO measurement
   externalDocs:

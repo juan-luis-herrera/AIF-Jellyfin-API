@@ -13,5 +13,8 @@ python_dateutil >= 2.6.0
 flask-cors >= 3.0.10
 setuptools >= 21.0.0
 Flask == 2.1.1
+# Requirements for the service API
 requests == 2.32.5
 influxdb-client == 1.49.0
+# WSGI server
+gunicorn==23.0.0
