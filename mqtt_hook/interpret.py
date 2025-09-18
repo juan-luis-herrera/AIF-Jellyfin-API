@@ -51,7 +51,7 @@ class MessageInterpreterJSONInflux(MessageInterpreterInflux):
         if element["name"] in self.KEYWORDS:
             return name, self._process_keyword(element["name"], msg)
         else:
-            value = message.get(element["name"], element["default"])
+            value = message.get(element["name"].split("/")[0], element["default"])
             if "/" in element["name"]:
                 for navigation in element["name"].split("/")[1:]:
                     if not isinstance(value, dict):

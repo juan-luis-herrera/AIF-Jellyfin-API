@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.title="MQTT2TSDB hook"
 LABEL org.opencontainers.image.description="Small service to write time-series data to a database from an incoming MQTT stream."
 
 WORKDIR /hook
-COPY * /hook
+COPY * /hook/
 RUN pip3 install -r requirements.txt --no-cache-dir
 
 ENTRYPOINT [ "python3" ]
