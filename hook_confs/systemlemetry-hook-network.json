@@ -1,0 +1,44 @@
+{
+    "measurement": "Network",
+    "tags": [
+        {
+            "name": "Device",
+            "default": "UNKNOWN"
+        },
+        {
+            "name": "Interface",
+            "default": "UNKNOWN"
+        }
+    ],
+    "fields": [
+        {
+            "name": "TX (bytes)",
+            "default": 0
+        },
+        {
+            "name": "RX (bytes)",
+            "default": 0
+        },
+        {
+            "name": "Errors (in)",
+            "default": 0
+        },
+        {
+            "name": "Errors (out)",
+            "default": 0
+        },
+        {
+            "name": "Dropped (in)",
+            "default": 0
+        },
+        {
+            "name": "Dropped (out)",
+            "default": 0
+        }
+    ],
+    "time": {
+        "name": "Time (UTC)",
+        "format": "%Y-%m-%d %H:%M:%S",
+        "timezone": "Etc/UTC"
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "measurement": "Temperatures",
+    "tags": [
+        {
+            "name": "Device",
+            "default": "UNKNOWN"
+        },
+        {
+            "name": "Sensor",
+            "default": "UNKNOWN"
+        }
+    ],
+    "fields": [
+        {
+            "name": "Temperature",
+            "default": 0
+        }
+    ],
+    "time": {
+        "name": "Time (UTC)",
+        "format": "%Y-%m-%d %H:%M:%S",
+        "timezone": "Etc/UTC"
+    }
+}

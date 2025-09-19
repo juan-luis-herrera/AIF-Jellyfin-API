@@ -1,0 +1,20 @@
+{
+    "measurement": "Processes",
+    "tags": [
+        {
+            "name": "Device",
+            "default": "UNKNOWN"
+        }
+    ],
+    "fields": [
+        {
+            "name": "Processes",
+            "default": 0
+        }
+    ],
+    "time": {
+        "name": "Time (UTC)",
+        "format": "%Y-%m-%d %H:%M:%S",
+        "timezone": "Etc/UTC"
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "measurement": "Memory",
+    "tags": [
+        {
+            "name": "Device",
+            "default": "UNKNOWN"
+        }
+    ],
+    "fields": [
+        {
+            "name": "Available (bytes)",
+            "default": 0
+        },
+        {
+            "name": "Usage (%)",
+            "default": 0
+        }
+    ],
+    "time": {
+        "name": "Time (UTC)",
+        "format": "%Y-%m-%d %H:%M:%S",
+        "timezone": "Etc/UTC"
+    }
+}

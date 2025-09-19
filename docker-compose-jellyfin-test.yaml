@@ -74,6 +74,120 @@ services:
     depends_on:
       - influxdb
       - mosquitto
+  cpu-freq-hook:
+    build:
+      context: mqtt_hook
+      dockerfile: Dockerfile
+    environment:
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_TOKEN=december
+      - INFLUX_ORG=tuwien
+      - INFLUX_BUCKET=telemetry
+      - MQTT_CLIENT_ID=cpu-freq-hook
+      - MQTT_TOPIC=systemlemetry/CPUFreq
+      - CONFIG_FILE=/confs/systemlemetry-hook-cpu-freq.json
+    volumes:
+      - ./hook_confs:/confs:ro
+    depends_on:
+      - influxdb
+      - mosquitto
+  cpu-pctg-hook:
+    build:
+      context: mqtt_hook
+      dockerfile: Dockerfile
+    environment:
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_TOKEN=december
+      - INFLUX_ORG=tuwien
+      - INFLUX_BUCKET=telemetry
+      - MQTT_CLIENT_ID=cpu-pctg-hook
+      - MQTT_TOPIC=systemlemetry/CPUPctg
+      - CONFIG_FILE=/confs/systemlemetry-hook-cpu-pctg.json
+    volumes:
+      - ./hook_confs:/confs:ro
+    depends_on:
+      - influxdb
+      - mosquitto
+  memory-hook:
+    build:
+      context: mqtt_hook
+      dockerfile: Dockerfile
+    environment:
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_TOKEN=december
+      - INFLUX_ORG=tuwien
+      - INFLUX_BUCKET=telemetry
+      - MQTT_CLIENT_ID=memory-hook
+      - MQTT_TOPIC=systemlemetry/Memory
+      - CONFIG_FILE=/confs/systemlemetry-hook-memory.json
+    volumes:
+      - ./hook_confs:/confs:ro
+    depends_on:
+      - influxdb
+      - mosquitto
+  network-hook:
+    build:
+      context: mqtt_hook
+      dockerfile: Dockerfile
+    environment:
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_TOKEN=december
+      - INFLUX_ORG=tuwien
+      - INFLUX_BUCKET=telemetry
+      - MQTT_CLIENT_ID=network-hook
+      - MQTT_TOPIC=systemlemetry/Network
+      - CONFIG_FILE=/confs/systemlemetry-hook-network.json
+    volumes:
+      - ./hook_confs:/confs:ro
+    depends_on:
+      - influxdb
+      - mosquitto
+  proc-hook:
+    build:
+      context: mqtt_hook
+      dockerfile: Dockerfile
+    environment:
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_TOKEN=december
+      - INFLUX_ORG=tuwien
+      - INFLUX_BUCKET=telemetry
+      - MQTT_CLIENT_ID=proc-hook
+      - MQTT_TOPIC=systemlemetry/Processes
+      - CONFIG_FILE=/confs/systemlemetry-hook-proc.json
+    volumes:
+      - ./hook_confs:/confs:ro
+    depends_on:
+      - influxdb
+      - mosquitto
+  temp-hook:
+    build:
+      context: mqtt_hook
+      dockerfile: Dockerfile
+    environment:
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_TOKEN=december
+      - INFLUX_ORG=tuwien
+      - INFLUX_BUCKET=telemetry
+      - MQTT_CLIENT_ID=temp-hook
+      - MQTT_TOPIC=systemlemetry/Temperatures
+      - CONFIG_FILE=/confs/systemlemetry-hook-temp.json
+    volumes:
+      - ./hook_confs:/confs:ro
+    depends_on:
+      - influxdb
+      - mosquitto
   service-api:
     build:
       context: service_api

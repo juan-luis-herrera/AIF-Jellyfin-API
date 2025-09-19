@@ -1,0 +1,24 @@
+{
+    "measurement": "CPU percentage",
+    "tags": [
+        {
+            "name": "Device",
+            "default": "UNKNOWN"
+        },
+        {
+            "name": "CPU",
+            "default": "Core -1"
+        }
+    ],
+    "fields": [
+        {
+            "name": "Percentage",
+            "default": 0
+        }
+    ],
+    "time": {
+        "name": "Time (UTC)",
+        "format": "%Y-%m-%d %H:%M:%S",
+        "timezone": "Etc/UTC"
+    }
+}
