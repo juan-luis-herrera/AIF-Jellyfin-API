@@ -10,5 +10,15 @@
             "max_range": 140
         },
         "query": "|> range(start: -5m)  |>filter(fn: (r) => r[\"_measurement\"] == \"jellyfin-qos\")  |>group(columns: [\"_field\"], mode: \"by\")  |> filter(fn: (r) => r[\"_field\"] == \"Transcoding FPS\")  |> mean()"
+    },
+    {
+        "id": "meanPower",
+        "name": "Mean (apparent) power consumption in the last hour",
+        "type": "range",
+        "description": {
+            "min_range": 0,
+            "max_range": 2500
+        },
+        "query": "|> range(start: -1h)  |> filter(fn: (r) => r[\"_measurement\"] == \"delock-energy\")  |> filter(fn: (r) => r[\"Machine\"] == \"energy/anemone/SENSOR\")  |> group(columns: [\"_field\"], mode: \"by\")  |> filter(fn: (r) => r[\"_field\"] == \"Apparent power\")  |> mean()"
     }
 ]
