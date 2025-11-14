@@ -1,0 +1,279 @@
+openapi: '3.0.4'
+info:
+  title: Service API
+  version: 'research-0.2'
+servers:
+  - url: https://apitest:80/v0
+externalDocs:
+  description: Read the paper on this specification
+  url: https://doi.org/ADD-THE-DOI-HERE-ONCE-WE-HAVE-IT
+tags:
+  - name: slo
+    description: Endpoints related to SLO measurement
+    externalDocs:
+      description: Read the work on how to use SLOs
+      url: https://doi.org/10.1109/SOSE62363.2024.00008 # On microservice SLOs, might change
+  - name: config
+    description: Endpoints related to service configuration
+paths:
+  /slos:
+    get:
+      tags:
+        - slo
+      summary: Discover, describe, and gather values of SLOs.
+      description: Returns the list of declared SLOs of the service with their definitions and current values
+      operationId: slo_discover
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json: # Could be changed to XML, JSON or other types if we need to
+              schema:
+                type: array
+                minItems: 1
+                items:
+                  $ref: "#/components/schemas/SLO"
+        '404':
+          description: This service declares no SLOs
+  /slos/{sloId}: # I think this+description is enough to calculate SLO fulfillment at the DEVOL level. We can add a /fulfillment endpoint otherwise
+    get:
+      tags:
+        - slo
+      summary: Describe and gather value of an SLO.
+      description: Returns the description and current value of the requested SLO.
+      operationId: slo_value
+      parameters:
+        - name: sloId
+          in: path
+          description: ID of SLO to describe
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            example: "rps"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SLO'
+        '404':
+          description: The requested SLO does not exist
+  /config:
+    get:
+      tags:
+        - config
+      summary: Discover, describe, and gather configuration.
+      description: Returns the list of configurable service parameters with their definitions and current values.
+      operationId: config_discover
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                minItems: 1
+                items:
+                  $ref: "#/components/schemas/ConfParam"
+        '404':
+          description: This service declares no configurable parameters.
+  /config/{confParam}:
+    get:
+      tags:
+        - config
+      summary: Parameter value.
+      description: Returns the description and current value of the requested parameter.
+      operationId: config_value
+      parameters:
+        - name: confParam
+          in: path
+          description: Name of the parameter to describe
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            example: "nextBackup"
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfParam'
+        '404':
+          description: The requested parameter does not exist
+    put:
+      tags:
+        - config
+      summary: Change parameter.
+      description: Changes the value of the requested parameter.
+      operationId: config_change
+      parameters:
+        - name: confParam
+          in: path
+          description: Name of the parameter to describe
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            example: "nextBackup"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfParamValue'
+      responses:
+        '200':
+          description: successful operation
+        '404':
+          description: The requested parameter does not exist
+        '400':
+          description: Invalid value for the parameter
+components:
+  schemas:
+    SLO:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+          example: "rps"
+        name:
+          type: string
+          minLength: 1
+          example: "Requests satisfied per second"
+        type:
+          $ref: "#/components/schemas/SLOType"
+          example: "integer_range"
+        value:
+          oneOf:
+          - type: boolean
+          - type: number
+          - type: string
+          example: 20
+        description:
+          $ref: "#/components/schemas/SLODescription"
+      required:
+        - id
+        - type
+        - description
+    SLODescription:
+      type: object
+      properties:
+        minValue:
+          oneOf:
+            - type: number
+            - type: string
+          example: 0
+        maxValue:
+          oneOf:
+            - type: number
+            - type: string
+          example: 30
+        minRange:
+          oneOf:
+            - type: number
+            - type: string
+          example: 0
+        maxRange:
+          oneOf:
+            - type: number
+            - type: string
+          example: 1000
+        target:
+          oneOf:
+            - type: boolean
+            - type: number
+            - type: string
+    SLOType:
+      type: string
+      enum:
+        - boolean
+        - range
+        - integer_range
+        - date_range
+        - datetime_range
+        - target_value
+        - integer_target_value
+        - string_target_value
+        - date_target_value
+        - datetime_target_value
+    ConfParam:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+          example: "nextBackup"
+        name:
+          type: string
+          example: "Time for next scheduled backup"
+          minLength: 1
+        type:
+          $ref: "#/components/schemas/ConfParamType"
+          example: "datetime_range"
+        description:
+          $ref: "#/components/schemas/ConfParamDescription"
+          example:
+            minValue: 2003-06-12T15:00:00Z
+            maxValue: 5012-07-04T05:12:23Z
+        value:
+          oneOf:
+            - type: boolean
+            - type: number
+            - type: string
+          example: 2015-06-08T10:41:05Z
+      required:
+        - id
+        - type
+        - description
+        - value
+    ConfParamType:
+      type: string
+      enum:
+        - boolean
+        - byte
+        - binary
+        - range
+        - integer_range
+        - date_range
+        - datetime_range
+        - numeric_value_list
+        - integer_value_list
+        - string_value_list
+        - date_value_list
+        - datetime_value_list
+        - byte_value_list
+        - binary_value_list
+    ConfParamDescription:
+      type: object
+      properties:
+        minValue:
+          oneOf:
+            - type: number
+            - type: string
+          example: 0
+        maxValue:
+          oneOf:
+            - type: number
+            - type: string
+          example: 30
+        valueList:
+          type: array
+          minItems: 1
+          items:
+            oneOf:
+              - type: number
+              - type: string
+    ConfParamValue:
+      type: object
+      properties:
+        value:
+          oneOf:
+            - type: boolean
+            - type: number
+            - type: string
+      required:
+        - value

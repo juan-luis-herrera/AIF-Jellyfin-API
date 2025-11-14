@@ -28,7 +28,7 @@ class ConfParamValue(Model):
 
         :param dikt: A dict.
         :type: dict
-        :return: The ConfParamValue of this ConfParamValue.  # noqa: E501
+        :return: The ConfParam_value of this ConfParamValue.  # noqa: E501
         :rtype: ConfParamValue
         """
         return util.deserialize_model(dikt, cls)

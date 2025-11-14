@@ -1,7 +1,7 @@
 openapi: 3.0.4
 info:
   title: Service API
-  version: research-0.1
+  version: research-0.2
 externalDocs:
   description: Read the paper on this specification
   url: https://doi.org/ADD-THE-DOI-HERE-ONCE-WE-HAVE-IT
@@ -18,31 +18,28 @@ tags:
 paths:
   /config:
     get:
-      description: Returns the list of configurable service parameters.
+      description: Returns the list of configurable service parameters with their
+        definitions and current values.
       operationId: config_discover
       responses:
         "200":
           content:
             application/json:
               schema:
-                example:
-                - nextBackup
-                - hwAcceleration
                 items:
-                  minLength: 1
-                  type: string
+                  $ref: "#/components/schemas/ConfParam"
                 minItems: 1
                 type: array
           description: successful operation
         "404":
           description: This service declares no configurable parameters.
-      summary: Discover configuration.
+      summary: "Discover, describe, and gather configuration."
       tags:
       - config
       x-openapi-router-controller: media_server_api.api_controllers.config_controller
   /config/{confParam}:
     get:
-      description: Returns the current value of the requested parameter.
+      description: Returns the description and current value of the requested parameter.
       operationId: config_value
       parameters:
       - description: Name of the parameter to describe
@@ -60,7 +57,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ConfParamValue"
+                $ref: "#/components/schemas/ConfParam"
           description: successful operation
         "404":
           description: The requested parameter does not exist
@@ -98,90 +95,31 @@ paths:
       tags:
       - config
       x-openapi-router-controller: media_server_api.api_controllers.config_controller
-  /config/{confParam}/description:
-    get:
-      description: Returns the description of the requested parameter.
-      operationId: config_describe
-      parameters:
-      - description: Name of the parameter to describe
-        explode: false
-        in: path
-        name: confParam
-        required: true
-        schema:
-          example: nextBackup
-          minLength: 1
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ConfParam"
-          description: successful operation
-        "404":
-          description: The requested parameter does not exist
-      summary: Describe configurable parameter.
-      tags:
-      - config
-      x-openapi-router-controller: media_server_api.api_controllers.config_controller
   /slos:
     get:
-      description: Returns the list of declared SLOs of the service.
+      description: Returns the list of declared SLOs of the service with their definitions
+        and current values
       operationId: slo_discover
       responses:
         "200":
           content:
             application/json:
               schema:
-                example:
-                - rps
-                - cost
                 items:
-                  minLength: 1
-                  type: string
+                  $ref: "#/components/schemas/SLO"
                 minItems: 1
                 type: array
           description: successful operation
         "404":
           description: This service declares no SLOs
-      summary: Discover SLOs.
+      summary: "Discover, describe, and gather values of SLOs."
       tags:
       - slo
       x-openapi-router-controller: media_server_api.api_controllers.slo_controller
   /slos/{sloId}:
     get:
-      description: Returns the current value of the requested SLO.
+      description: Returns the description and current value of the requested SLO.
       operationId: slo_value
-      parameters:
-      - description: ID of SLO to describe
-        explode: false
-        in: path
-        name: sloId
-        required: true
-        schema:
-          example: rps
-          minLength: 1
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SLOValue"
-          description: successful operation
-        "404":
-          description: The requested SLO does not exist
-      summary: SLO value.
-      tags:
-      - slo
-      x-openapi-router-controller: media_server_api.api_controllers.slo_controller
-  /slos/{sloId}/description:
-    get:
-      description: Returns the description of the requested SLO.
-      operationId: slo_describe
       parameters:
       - description: ID of SLO to describe
         explode: false
@@ -202,7 +140,7 @@ paths:
           description: successful operation
         "404":
           description: The requested SLO does not exist
-      summary: Describe SLO.
+      summary: Describe and gather value of an SLO.
       tags:
       - slo
       x-openapi-router-controller: media_server_api.api_controllers.slo_controller
@@ -214,10 +152,12 @@ components:
         description:
           minValue: 0
           maxValue: 30
-          minRange: 0
           maxRange: 1000
+          minRange: 0
+          target: true
         id: rps
-        type: integer_range
+        type: boolean
+        value: 20
       properties:
         id:
           example: rps
@@ -231,13 +171,36 @@ components:
           type: string
         type:
           $ref: "#/components/schemas/SLOType"
+        value:
+          $ref: "#/components/schemas/SLO_value"
         description:
-          $ref: "#/components/schemas/SLO_description"
+          $ref: "#/components/schemas/SLODescription"
       required:
       - description
       - id
       - type
       title: SLO
+      type: object
+    SLODescription:
+      example:
+        minValue: 0
+        maxValue: 30
+        maxRange: 1000
+        minRange: 0
+        target: true
+      properties:
+        minValue:
+          $ref: "#/components/schemas/SLODescription_minValue"
+        maxValue:
+          $ref: "#/components/schemas/SLODescription_maxValue"
+        minRange:
+          $ref: "#/components/schemas/SLODescription_minValue"
+        maxRange:
+          $ref: "#/components/schemas/SLODescription_maxRange"
+        target:
+          $ref: "#/components/schemas/SLODescription_target"
+      title: SLODescription
+      type: object
     SLOType:
       enum:
       - boolean
@@ -250,130 +213,20 @@ components:
       - string_target_value
       - date_target_value
       - datetime_target_value
+      title: SLOType
       type: string
-    BooleanSLO:
-      type: boolean
-    RangeSLO:
-      properties:
-        minValue:
-          example: 5.1
-          title: minValue
-          type: number
-        maxValue:
-          example: 10.5
-          title: maxValue
-          type: number
-        minRange:
-          example: -0.5
-          title: minRange
-          type: number
-        maxRange:
-          example: 100.99
-          title: maxRange
-          type: number
-      required:
-      - maxRange
-      - minRange
-      title: RangeSLO
-    IntegerRangeSLO:
-      properties:
-        minValue:
-          example: 5
-          title: minValue
-          type: integer
-        maxValue:
-          example: 10
-          title: maxValue
-          type: integer
-        minRange:
-          example: -10
-          title: minRange
-          type: integer
-        maxRange:
-          example: 100
-          title: maxRange
-          type: integer
-      required:
-      - maxRange
-      - minRange
-      title: IntegerRangeSLO
-    DateRangeSLO:
-      properties:
-        minValue:
-          example: 2003-06-12
-          format: date
-          title: minValue
-          type: string
-        maxValue:
-          example: 2010-10-03
-          format: date
-          title: maxValue
-          type: string
-        minRange:
-          example: 1970-01-01
-          format: date
-          title: minRange
-          type: string
-        maxRange:
-          example: 5012-07-04
-          format: date
-          title: maxRange
-          type: string
-      required:
-      - maxRange
-      - minRange
-      title: DateRangeSLO
-    DateTimeRangeSLO:
-      properties:
-        minValue:
-          example: 2003-06-12T12:00:00Z
-          format: date-time
-          title: minValue
-          type: string
-        maxValue:
-          example: 2010-10-03T10:15:00Z
-          format: date
-          title: maxValue
-          type: string
-        minRange:
-          example: 1970-01-01T00:00:00Z
-          format: date
-          title: minRange
-          type: string
-        maxRange:
-          example: 5012-07-04T05:12:23Z
-          format: date
-          title: maxRange
-          type: string
-      required:
-      - maxRange
-      - minRange
-      title: DateTimeRangeSLO
-    TargetValueSLO:
-      type: number
-    IntegerTargetValueSLO:
-      type: integer
-    StringTargetValueSLO:
-      type: string
-    DateTargetValueSLO:
-      format: date
-      type: string
-    DateTimeTargetValueSLO:
-      format: date-time
-      type: string
-    SLOValue:
-      oneOf:
-      - type: boolean
-      - type: number
-      - type: string
     ConfParam:
       example:
         name: Time for next scheduled backup
         description:
-          minValue: 2003-06-12T15:00:00Z
-          maxValue: 5012-07-04T05:12:23Z
+          minValue: 0
+          maxValue: 30
+          valueList:
+          - 0.8008281904610115
+          - 0.8008281904610115
         id: nextBackup
-        type: datetime_range
+        type: boolean
+        value: 2015-06-08T10:41:05Z
       properties:
         id:
           example: nextBackup
@@ -388,12 +241,16 @@ components:
         type:
           $ref: "#/components/schemas/ConfParamType"
         description:
-          $ref: "#/components/schemas/ConfParam_description"
+          $ref: "#/components/schemas/ConfParamDescription"
+        value:
+          $ref: "#/components/schemas/ConfParam_value"
       required:
       - description
       - id
       - type
+      - value
       title: ConfParam
+      type: object
     ConfParamType:
       enum:
       - boolean
@@ -410,143 +267,78 @@ components:
       - datetime_value_list
       - byte_value_list
       - binary_value_list
+      title: ConfParamType
       type: string
-    BooleanConfParam:
-      type: boolean
-    ByteConfParam:
-      example: SS4gSGVhci4gQS4gU291bmQu==
-      format: byte
-      type: string
-    BinaryConfParam:
-      format: binary
-      type: string
-    RangeConfParam:
+    ConfParamDescription:
+      example:
+        minValue: 0
+        maxValue: 30
+        valueList:
+        - 0.8008281904610115
+        - 0.8008281904610115
       properties:
         minValue:
-          example: -10.5
-          title: minValue
-          type: number
+          $ref: "#/components/schemas/SLODescription_minValue"
         maxValue:
-          example: 20.1
-          title: maxValue
-          type: number
-      title: RangeConfParam
-    IntegerRangeConfParam:
-      properties:
-        minValue:
-          example: -512
-          title: minValue
-          type: integer
-        maxValue:
-          example: 23
-          title: maxValue
-          type: number
-      title: IntegerRangeConfParam
-    DateRangeConfParam:
-      properties:
-        minValue:
-          example: 2003-06-12
-          format: date
-          title: minValue
-          type: string
-        maxValue:
-          example: 2010-10-03
-          format: date
-          title: maxValue
-          type: string
-      title: DateRangeConfParam
-    DateTimeRangeConfParam:
-      properties:
-        minValue:
-          example: 2003-06-12T15:00:00Z
-          format: date-time
-          title: minValue
-          type: string
-        maxValue:
-          example: 2010-10-03T10:15:00Z
-          format: date
-          title: maxValue
-          type: string
-      title: DateTimeRangeConfParam
-    NumericValueListConfParam:
-      items:
-        type: number
-      minItems: 1
-      type: array
-    IntegerValueListConfParam:
-      items:
-        type: integer
-      minItems: 1
-      type: array
-    StringValueListConfParam:
-      items:
-        type: string
-      minItems: 1
-      type: array
-    DateValueListConfParam:
-      items:
-        format: date
-        type: string
-      minItems: 1
-      type: array
-    DateTimeValueListConfParam:
-      items:
-        format: date-time
-        type: string
-      minItems: 1
-      type: array
-    ByteValueListConfParam:
-      items:
-        format: byte
-        type: string
-      minItems: 1
-      type: array
-    BinaryValueListConfParam:
-      items:
-        format: binary
-        type: string
-      minItems: 1
-      type: array
+          $ref: "#/components/schemas/SLODescription_maxValue"
+        valueList:
+          items:
+            $ref: "#/components/schemas/ConfParamDescription_valueList_inner"
+          minItems: 1
+          title: valueList
+          type: array
+      title: ConfParamDescription
+      type: object
     ConfParamValue:
+      example:
+        value: true
+      properties:
+        value:
+          $ref: "#/components/schemas/SLODescription_target"
+      required:
+      - value
+      title: ConfParamValue
+      type: object
+    SLO_value:
+      example: 20
       oneOf:
       - type: boolean
       - type: number
       - type: string
-    SLO_description:
-      example:
-        minValue: 0
-        maxValue: 30
-        minRange: 0
-        maxRange: 1000
+      title: SLO_value
+    SLODescription_minValue:
+      example: 0
       oneOf:
-      - $ref: "#/components/schemas/BooleanSLO"
-      - $ref: "#/components/schemas/RangeSLO"
-      - $ref: "#/components/schemas/IntegerRangeSLO"
-      - $ref: "#/components/schemas/DateRangeSLO"
-      - $ref: "#/components/schemas/DateTimeRangeSLO"
-      - $ref: "#/components/schemas/TargetValueSLO"
-      - $ref: "#/components/schemas/IntegerTargetValueSLO"
-      - $ref: "#/components/schemas/StringTargetValueSLO"
-      - $ref: "#/components/schemas/DateTargetValueSLO"
-      - $ref: "#/components/schemas/DateTimeTargetValueSLO"
-      title: SLO_description
-    ConfParam_description:
-      example:
-        minValue: 2003-06-12T15:00:00Z
-        maxValue: 5012-07-04T05:12:23Z
+      - type: number
+      - type: string
+      title: SLODescription_minValue
+    SLODescription_maxValue:
+      example: 30
       oneOf:
-      - $ref: "#/components/schemas/BooleanConfParam"
-      - $ref: "#/components/schemas/ByteConfParam"
-      - $ref: "#/components/schemas/BinaryConfParam"
-      - $ref: "#/components/schemas/RangeConfParam"
-      - $ref: "#/components/schemas/IntegerRangeConfParam"
-      - $ref: "#/components/schemas/DateRangeConfParam"
-      - $ref: "#/components/schemas/DateTimeRangeConfParam"
-      - $ref: "#/components/schemas/NumericValueListConfParam"
-      - $ref: "#/components/schemas/IntegerValueListConfParam"
-      - $ref: "#/components/schemas/StringValueListConfParam"
-      - $ref: "#/components/schemas/DateValueListConfParam"
-      - $ref: "#/components/schemas/DateTimeValueListConfParam"
-      - $ref: "#/components/schemas/ByteValueListConfParam"
-      - $ref: "#/components/schemas/BinaryValueListConfParam"
-      title: ConfParam_description
+      - type: number
+      - type: string
+      title: SLODescription_maxValue
+    SLODescription_maxRange:
+      example: 1000
+      oneOf:
+      - type: number
+      - type: string
+      title: SLODescription_maxRange
+    SLODescription_target:
+      oneOf:
+      - type: boolean
+      - type: number
+      - type: string
+      title: SLODescription_target
+    ConfParam_value:
+      example: 2015-06-08T10:41:05Z
+      oneOf:
+      - type: boolean
+      - type: number
+      - type: string
+      title: ConfParam_value
+    ConfParamDescription_valueList_inner:
+      oneOf:
+      - type: number
+      - type: string
+      title: ConfParamDescription_valueList_inner

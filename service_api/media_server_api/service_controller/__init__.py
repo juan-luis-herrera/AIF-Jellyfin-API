@@ -19,11 +19,7 @@ class ServiceController(ABC):
         pass
 
     @abstractmethod
-    def describe_param(self, param_id: str) -> ConfParam|None:
-        pass
-
-    @abstractmethod
-    def get_param_value(self, param_id: str):
+    def get_param(self, param_id: str):
         pass
 
     @abstractmethod

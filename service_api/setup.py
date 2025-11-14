@@ -2,7 +2,7 @@ import sys
 from setuptools import setup, find_packages
 
 NAME = "media_server_api"
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 
 # To install the library, run the following
 #

@@ -5,7 +5,9 @@ from typing import Union
 
 from media_server_api.models.conf_param import ConfParam  # noqa: E501
 from media_server_api.models.conf_param_value import ConfParamValue  # noqa: E501
-from media_server_api import util, api_bridge
+from media_server_api import util
+from media_server_api import api_bridge
+
 
 def config_change(conf_param, body=None):  # noqa: E501
     """Change parameter.
@@ -20,39 +22,20 @@ def config_change(conf_param, body=None):  # noqa: E501
     :rtype: Union[None, Tuple[None, int], Tuple[None, int, Dict[str, str]]
     """
     conf_param_value = body
-    if conf_param in api_bridge.SERVICE_CONTROLLER.discover_configuration():
-        if api_bridge.SERVICE_CONTROLLER.set_param_value(conf_param, conf_param_value):
-            return "", 200
-        else:
-            return "Invalid value for the parameter", 400
-    else:
-        return "The requested parameter does not exist", 404
-
-
-def config_describe(conf_param):  # noqa: E501
-    """Describe configurable parameter.
-
-    Returns the description of the requested parameter. # noqa: E501
-
-    :param conf_param: Name of the parameter to describe
-    :type conf_param: str
-
-    :rtype: Union[ConfParam, Tuple[ConfParam, int], Tuple[ConfParam, int, Dict[str, str]]
-    """
-    description = api_bridge.SERVICE_CONTROLLER.describe_param(conf_param)
-    if description is not None:
-        return description, 200
-    else:
-        return "The requested parameter does not exist", 404
+    if connexion.request.is_json:
+        conf_param_value = ConfParamValue.from_dict(connexion.request.get_json())  # noqa: E501
+        code = api_bridge.SERVICE_CONTROLLER.set_param_value(conf_param, conf_param_value["value"])
+        return {200: "", 404: "The requested parameter does not exist", 400: "Invalid value for the parameter"}[code], code
+    return "Invalid value for the parameter", 400
 
 
 def config_discover():  # noqa: E501
-    """Discover configuration.
+    """Discover, describe, and gather configuration.
 
-    Returns the list of configurable service parameters. # noqa: E501
+    Returns the list of configurable service parameters with their definitions and current values. # noqa: E501
 
 
-    :rtype: Union[List[str], Tuple[List[str], int], Tuple[List[str], int, Dict[str, str]]
+    :rtype: Union[List[ConfParam], Tuple[List[ConfParam], int], Tuple[List[ConfParam], int, Dict[str, str]]
     """
     return api_bridge.SERVICE_CONTROLLER.discover_configuration(), 200
 
@@ -60,14 +43,14 @@ def config_discover():  # noqa: E501
 def config_value(conf_param):  # noqa: E501
     """Parameter value.
 
-    Returns the current value of the requested parameter. # noqa: E501
+    Returns the description and current value of the requested parameter. # noqa: E501
 
     :param conf_param: Name of the parameter to describe
     :type conf_param: str
 
-    :rtype: Union[ConfParamValue, Tuple[ConfParamValue, int], Tuple[ConfParamValue, int, Dict[str, str]]
+    :rtype: Union[ConfParam, Tuple[ConfParam, int], Tuple[ConfParam, int, Dict[str, str]]
     """
-    value = api_bridge.SERVICE_CONTROLLER.get_param_value(conf_param)
+    value = api_bridge.SERVICE_CONTROLLER.get_param(conf_param)
     if value is not None:
         return value, 200
     else:

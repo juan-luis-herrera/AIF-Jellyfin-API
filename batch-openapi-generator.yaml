@@ -1,9 +1,9 @@
-inputSpec: ServiceAPIExample.yml
+inputSpec: ServiceAPI-OpenAPI.yaml
 outputDir: service_api
 generatorName: python-flask
 controllerPackage: api_controllers
 defaultController: api_controller
 featureCORS: true
 packageName: media_server_api
-packageVersion: 0.0.1
+packageVersion: 0.0.2
 serverPort: 8080

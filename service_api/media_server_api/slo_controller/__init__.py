@@ -24,12 +24,8 @@ class SLOController(ABC):
         pass
     
     @abstractmethod
-    def describe_slo(self, slo_id: str) -> SLO|None:
+    def get_slo(self, slo_id: str) -> SLO|None:
         pass
-    
-    @abstractmethod
-    def get_value_slo(self, slo_id: str):
-        pass 
 
 from influxdb_client import InfluxDBClient
 
@@ -52,22 +48,29 @@ class InfluxDBSLOController(SLOController):
 
     def discover_slos(self) -> list[str]:
         self._logger.debug("SLO discovery called")
-        return list(self._slos.keys())
+        for slo in self._slos:
+            self._update_value(slo)
+        return self._slos.copy()
     
-    def describe_slo(self, slo_id: str) -> SLO|None:
+    def get_slo(self, slo_id: str):
         self._logger.debug(f"SLO {slo_id} described")
         if slo_id not in self._slos:
             self._logger.warning(f"SLO {slo_id} does not exist")
-        return self._slos.get(slo_id)
-    
-    def get_value_slo(self, slo_id: str):
-        query_api = self._influx_client.query_api()
-        result = query_api.query(self._queries[slo_id])
-        self._logger.debug("Successfully queried InfluxDB")
-        if len(result) > 0 and len(result[0].records) > 0:
-            if len(result) > 1 or len(result[0].records) > 1:
-                self._logger.warning("Multiple tables or records returned. Only the first one will be returned.")
-            return result[0].records[0].get_value()
         else:
-            self._logger.warning(f"No records found for SLO {slo_id}")
-            return None 
+            self._update_value(slo_id)
+        return self._slos.get(slo_id)
+
+    def _update_value(self, slo_id: str):
+        if slo_id in self._slos:
+            query_api = self._influx_client.query_api()
+            result = query_api.query(self._queries[slo_id])
+            self._logger.debug("Successfully queried InfluxDB")
+            if len(result) > 0 and len(result[0].records) > 0:
+                if len(result) > 1 or len(result[0].records) > 1:
+                    self._logger.warning("Multiple tables or records returned. Only the first one will be returned.")
+                value = result[0].records[0].get_value()
+            else:
+                self._logger.warning(f"No records found for SLO {slo_id}")
+                value = None 
+            self._slos[slo_id].value = value
+        

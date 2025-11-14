@@ -7,7 +7,6 @@ from media_server_api.service_controller.jellyfin import config
 from media_server_api.models.conf_param import ConfParam
 from media_server_api.models.conf_param_type import ConfParamType
 from media_server_api.models.conf_param_description import ConfParamDescription
-from media_server_api.models.integer_range_conf_param import IntegerRangeConfParam
 
 
 class JellyfinController(ServiceController):
@@ -23,25 +22,29 @@ class JellyfinController(ServiceController):
             id="EncodingThreadCount",
             name="Number of threads used for encoding",
             type=ConfParamType.INTEGER_RANGE,
-            description=IntegerRangeConfParam(min_value=-1, max_value=8)
+            description=ConfParamDescription(min_value=-1, max_value=8),
+            value=None
         ),
         "EnableThrottling": ConfParam(
             id="EnableThrottling",
             name="Stop transcoding once it gets far ahead enough from the current playback position",
             type=ConfParamType.BOOLEAN,
-            description=False
+            description=False,
+            value=None
         ),
         "ThrottleDelaySeconds": ConfParam(
             id="ThrottleDelaySeconds",
             name="Number of seconds the transcoder must be ahead of the playback position to throttle",
             type=ConfParamType.INTEGER_RANGE,
-            description=IntegerRangeConfParam(min_value=1)
+            description=ConfParamDescription(min_value=1),
+            value=None
         ),
         "EnableHardwareEncoding": ConfParam(
             id="EnableHardwareEncoding",
             name="Enable or disable hardware-acceleration transcoding",
             type=ConfParamType.BOOLEAN,
-            description=False
+            description=False,
+            value=None
         ),
         # HardwareAccelerationType causes issues on Jellyfin's side. Best left out for now.
         #"HardwareAccelerationType": ConfParam(
@@ -54,25 +57,29 @@ class JellyfinController(ServiceController):
             id="AllowHevcEncoding",
             name="Enable HEVC transcoding",
             type=ConfParamType.BOOLEAN,
-            description=False
+            description=False,
+            value=None
         ),
         "AllowAv1Encoding": ConfParam(
             id="AllowAv1Encoding",
             name="Enable AV1 encoding",
             type=ConfParamType.BOOLEAN,
-            description=False
+            description=False,
+            value=None
         ),
         "EnableSegmentDeletion": ConfParam(
             id="EnableSegmentDeletion",
             name="Delete segments after being downloaded from the client",
             type=ConfParamType.BOOLEAN,
-            description=False
+            description=False,
+            value=None
         ),
         "SegmentKeepSeconds": ConfParam(
             id="SegmentKeepSeconds",
             name="Seconds to keep each segment for before being discarded",
             type=ConfParamType.INTEGER_RANGE,
-            description=IntegerRangeConfParam(min_value=1)
+            description=ConfParamDescription(min_value=1),
+            value=None
         )
     }
 
@@ -126,15 +133,40 @@ class JellyfinController(ServiceController):
 
     def discover_configuration(self) -> list[str]:
         self._logger.debug("Configuration discovery called")
-        return sorted(list(self._CONFIGURATION_PARAMS.keys()))
+        self._refresh_all_values()
+        return list(self._CONFIGURATION_PARAMS.values())
 
-    def describe_param(self, param_id: str) -> ConfParam|None:
+    def get_param(self, param_id: str) -> ConfParam|None:
         self._logger.debug(f"Param description for {param_id} requested")
         if param_id not in self._CONFIGURATION_PARAMS:
             self._logger.warning(f"Param {param_id} does not exist")
+        else:
+            if not self._refresh_value(param_id):
+                return None
         return self._CONFIGURATION_PARAMS.get(param_id)
+    
+    def _refresh_value(self, param_id: str) -> bool:
+        self._logger.debug(f"Refreshing {param_id}")
+        param_val = self._call_param_get(param_id)
+        if param_val is not None:
+            self._logger.info(f"{param_id} retrieved successfully")
+            self._CONFIGURATION_PARAMS[param_id].value = param_val
+        else:
+            self._logger.error(f"Error retrieving {param_id}")
+        return param_val is not None
+        
+    
+    def _refresh_all_values(self):
+        self._logger.debug("Refreshing all values")
+        transcoding_req = self._session.get(f"{config.JELLYFIN_URL}{self._API_ENDPOINTS[self._TRANSCODING_KEY]}")
+        if transcoding_req.ok and 'json' in transcoding_req.headers.get("content-type", ''):
+            transcoding_conf = transcoding_req.json()
+            for param_id in self._CONFIGURATION_PARAMS:
+                self._CONFIGURATION_PARAMS[param_id].value = transcoding_conf.get(param_id)
 
-    def set_param_value(self, param_id: str, param_value) -> bool:
+    def set_param_value(self, param_id: str, param_value) -> int:
+        if param_id not in self._CONFIGURATION_PARAMS:
+            return 404
         # We assume that the caller already checked the param exists.
         # Else, they get a much deserved exception.
         # This also rejects setting undeclared params
@@ -149,23 +181,10 @@ class JellyfinController(ServiceController):
                 self._logger.info(f"{param_id} updated successfully")
             else:
                 self._logger.error(f"Error on updating {param_id} to {param_value}")
-        return valid
+        return 200 if valid else 400
 
     def _call_param_update(self, param_id: str, param_value) -> bool:
         return self._session.post(f"{config.JELLYFIN_URL}{self._API_ENDPOINTS[self._TRANSCODING_KEY]}", json={param_id: param_value}).ok
-
-    def get_param_value(self, param_id: str):
-        self._logger.debug(f"Querying for param {param_id}")
-        if param_id in self._CONFIGURATION_PARAMS: # Security hole otherwise - Undeclared params could be queried
-            param_val = self._call_param_get(param_id)
-            if param_val is not None:
-                self._logger.info(f"{param_id} retrieved successfully")
-            else:
-                self._logger.error(f"Error retrieving {param_id}")
-        else:
-            self._logger.warning(f"{param_id} does not exist")
-            param_val = None
-        return param_val
 
     def _call_param_get(self, param_id: str):
         transcoding_req = self._session.get(f"{config.JELLYFIN_URL}{self._API_ENDPOINTS[self._TRANSCODING_KEY]}")

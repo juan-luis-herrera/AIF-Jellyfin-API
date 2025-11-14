@@ -15,7 +15,7 @@ class TestConfigController(BaseTestCase):
 
         Change parameter.
         """
-        conf_param_value = true
+        conf_param_value = {"value":True}
         headers = { 
             'Content-Type': 'application/json',
         }
@@ -28,25 +28,10 @@ class TestConfigController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_config_describe(self):
-        """Test case for config_describe
-
-        Describe configurable parameter.
-        """
-        headers = { 
-            'Accept': 'application/json',
-        }
-        response = self.client.open(
-            '/v0/config/{conf_param}/description'.format(conf_param='nextBackup'),
-            method='GET',
-            headers=headers)
-        self.assert200(response,
-                       'Response body is : ' + response.data.decode('utf-8'))
-
     def test_config_discover(self):
         """Test case for config_discover
 
-        Discover configuration.
+        Discover, describe, and gather configuration.
         """
         headers = { 
             'Accept': 'application/json',
