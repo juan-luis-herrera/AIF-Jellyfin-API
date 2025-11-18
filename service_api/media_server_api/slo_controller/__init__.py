@@ -50,7 +50,7 @@ class InfluxDBSLOController(SLOController):
         self._logger.debug("SLO discovery called")
         for slo in self._slos:
             self._update_value(slo)
-        return self._slos.copy()
+        return list(self._slos.values())
     
     def get_slo(self, slo_id: str):
         self._logger.debug(f"SLO {slo_id} described")

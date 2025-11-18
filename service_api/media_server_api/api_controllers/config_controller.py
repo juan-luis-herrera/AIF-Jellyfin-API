@@ -4,9 +4,8 @@ from typing import Tuple
 from typing import Union
 
 from media_server_api.models.conf_param import ConfParam  # noqa: E501
-from media_server_api.models.conf_param_value import ConfParamValue  # noqa: E501
-from media_server_api import util
-from media_server_api import api_bridge
+from media_server_api.models.conf_param_change import ConfParamChange  # noqa: E501
+from media_server_api import util, api_bridge
 
 
 def config_change(conf_param, body=None):  # noqa: E501
@@ -16,18 +15,17 @@ def config_change(conf_param, body=None):  # noqa: E501
 
     :param conf_param: Name of the parameter to describe
     :type conf_param: str
-    :param conf_param_value: 
-    :type conf_param_value: dict | bytes
+    :param conf_param_change: 
+    :type conf_param_change: dict | bytes
 
     :rtype: Union[None, Tuple[None, int], Tuple[None, int, Dict[str, str]]
     """
-    conf_param_value = body
+    conf_param_change = body
     if connexion.request.is_json:
-        conf_param_value = ConfParamValue.from_dict(connexion.request.get_json())  # noqa: E501
-        code = api_bridge.SERVICE_CONTROLLER.set_param_value(conf_param, conf_param_value["value"])
+        conf_param_change = ConfParamChange.from_dict(connexion.request.get_json())  # noqa: E501
+        code = api_bridge.SERVICE_CONTROLLER.set_param_value(conf_param, conf_param_change.value)
         return {200: "", 404: "The requested parameter does not exist", 400: "Invalid value for the parameter"}[code], code
     return "Invalid value for the parameter", 400
-
 
 def config_discover():  # noqa: E501
     """Discover, describe, and gather configuration.
@@ -40,7 +38,7 @@ def config_discover():  # noqa: E501
     return api_bridge.SERVICE_CONTROLLER.discover_configuration(), 200
 
 
-def config_value(conf_param):  # noqa: E501
+def config_get(conf_param):  # noqa: E501
     """Parameter value.
 
     Returns the description and current value of the requested parameter. # noqa: E501
@@ -55,3 +53,4 @@ def config_value(conf_param):  # noqa: E501
         return value, 200
     else:
         return "The requested parameter does not exist", 404
+

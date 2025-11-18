@@ -1,6 +1,7 @@
 # flake8: noqa
 # import models into model package
 from media_server_api.models.conf_param import ConfParam
+from media_server_api.models.conf_param_change import ConfParamChange
 from media_server_api.models.conf_param_description import ConfParamDescription
 from media_server_api.models.conf_param_description_value_list_inner import ConfParamDescriptionValueListInner
 from media_server_api.models.conf_param_type import ConfParamType

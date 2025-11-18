@@ -18,7 +18,7 @@ def slo_discover():  # noqa: E501
     return api_bridge.SLO_CONTROLLER.discover_slos(), 200
 
 
-def slo_value(slo_id):  # noqa: E501
+def slo_get(slo_id):  # noqa: E501
     """Describe and gather value of an SLO.
 
     Returns the description and current value of the requested SLO. # noqa: E501

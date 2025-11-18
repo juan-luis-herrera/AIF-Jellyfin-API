@@ -1,9 +1,9 @@
 openapi: '3.0.4'
 info:
   title: Service API
-  version: 'research-0.2'
+  version: 'research-0.3'
 servers:
-  - url: https://apitest:80/v0
+  - url: https://localhost:80/v0
 externalDocs:
   description: Read the paper on this specification
   url: https://doi.org/ADD-THE-DOI-HERE-ONCE-WE-HAVE-IT
@@ -41,7 +41,7 @@ paths:
         - slo
       summary: Describe and gather value of an SLO.
       description: Returns the description and current value of the requested SLO.
-      operationId: slo_value
+      operationId: slo_get
       parameters:
         - name: sloId
           in: path
@@ -85,7 +85,7 @@ paths:
         - config
       summary: Parameter value.
       description: Returns the description and current value of the requested parameter.
-      operationId: config_value
+      operationId: config_get
       parameters:
         - name: confParam
           in: path
@@ -123,7 +123,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConfParamValue'
+              $ref: '#/components/schemas/ConfParamChange'
       responses:
         '200':
           description: successful operation
@@ -267,7 +267,7 @@ components:
             oneOf:
               - type: number
               - type: string
-    ConfParamValue:
+    ConfParamChange:
       type: object
       properties:
         value:

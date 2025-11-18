@@ -3,7 +3,7 @@ import unittest
 from flask import json
 
 from media_server_api.models.conf_param import ConfParam  # noqa: E501
-from media_server_api.models.conf_param_value import ConfParamValue  # noqa: E501
+from media_server_api.models.conf_param_change import ConfParamChange  # noqa: E501
 from media_server_api.test import BaseTestCase
 
 
@@ -15,7 +15,7 @@ class TestConfigController(BaseTestCase):
 
         Change parameter.
         """
-        conf_param_value = {"value":True}
+        conf_param_change = {"value":True}
         headers = { 
             'Content-Type': 'application/json',
         }
@@ -23,7 +23,7 @@ class TestConfigController(BaseTestCase):
             '/v0/config/{conf_param}'.format(conf_param='nextBackup'),
             method='PUT',
             headers=headers,
-            data=json.dumps(conf_param_value),
+            data=json.dumps(conf_param_change),
             content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -43,8 +43,8 @@ class TestConfigController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_config_value(self):
-        """Test case for config_value
+    def test_config_get(self):
+        """Test case for config_get
 
         Parameter value.
         """

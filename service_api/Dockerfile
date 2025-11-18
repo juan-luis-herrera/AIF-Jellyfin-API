@@ -1,4 +1,4 @@
-FROM python:3-alpine
+FROM python:3.13-alpine
 
 ENV WORKERS=1
 ENV LISTEN_HOST=0.0.0.0

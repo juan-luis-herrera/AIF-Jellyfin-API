@@ -1,12 +1,12 @@
 openapi: 3.0.4
 info:
   title: Service API
-  version: research-0.2
+  version: research-0.3
 externalDocs:
   description: Read the paper on this specification
   url: https://doi.org/ADD-THE-DOI-HERE-ONCE-WE-HAVE-IT
 servers:
-- url: https://apitest:80/v0
+- url: https://localhost:80/v0
 tags:
 - description: Endpoints related to SLO measurement
   externalDocs:
@@ -40,7 +40,7 @@ paths:
   /config/{confParam}:
     get:
       description: Returns the description and current value of the requested parameter.
-      operationId: config_value
+      operationId: config_get
       parameters:
       - description: Name of the parameter to describe
         explode: false
@@ -83,7 +83,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ConfParamValue"
+              $ref: "#/components/schemas/ConfParamChange"
       responses:
         "200":
           description: successful operation
@@ -119,7 +119,7 @@ paths:
   /slos/{sloId}:
     get:
       description: Returns the description and current value of the requested SLO.
-      operationId: slo_value
+      operationId: slo_get
       parameters:
       - description: ID of SLO to describe
         explode: false
@@ -289,7 +289,7 @@ components:
           type: array
       title: ConfParamDescription
       type: object
-    ConfParamValue:
+    ConfParamChange:
       example:
         value: true
       properties:
@@ -297,7 +297,7 @@ components:
           $ref: "#/components/schemas/SLODescription_target"
       required:
       - value
-      title: ConfParamValue
+      title: ConfParamChange
       type: object
     SLO_value:
       example: 20

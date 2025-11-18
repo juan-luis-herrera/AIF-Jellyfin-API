@@ -24,8 +24,8 @@ class TestSloController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_slo_value(self):
-        """Test case for slo_value
+    def test_slo_get(self):
+        """Test case for slo_get
 
         Describe and gather value of an SLO.
         """

@@ -15,6 +15,7 @@ media_server_api/encoder.py
 media_server_api/models/__init__.py
 media_server_api/models/base_model.py
 media_server_api/models/conf_param.py
+media_server_api/models/conf_param_change.py
 media_server_api/models/conf_param_description.py
 media_server_api/models/conf_param_description_value_list_inner.py
 media_server_api/models/conf_param_type.py
