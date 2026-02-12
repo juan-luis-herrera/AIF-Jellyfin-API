@@ -1,4 +1,4 @@
-# AIF-Media-API
+# Jellyfin Service API
 
 ## What is this repository?
 
