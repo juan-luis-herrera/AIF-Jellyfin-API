@@ -1,5 +1,7 @@
 # Jellyfin Service API
 
+[![DOI](https://zenodo.org/badge/1028413171.svg)](https://doi.org/10.5281/zenodo.18622181)
+
 ## What is this repository?
 
 This is an implementation of the Service Configuration API, as proposed in [Active Inference for Sustainable Computing Continuum Systems](https://doi.org/10.1109/MIC.2025.3590621), and implemented in A Microservice-Based Platform for Sustainable and Intelligent SLO Fulfilment and Service Management. It specifically implements the API in the Media streaming use case.
