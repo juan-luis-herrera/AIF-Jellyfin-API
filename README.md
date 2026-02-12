@@ -2,7 +2,7 @@
 
 ## What is this repository?
 
-This is a small Proof-of-Concept implementation of the Service Configuration API, as proposed in the Internet Computing paper. For now, it implements the API in the Media streaming use case.
+This is an implementation of the Service Configuration API, as proposed in [Active Inference for Sustainable Computing Continuum Systems](https://doi.org/10.1109/MIC.2025.3590621), and implemented in A Microservice-Based Platform for Sustainable and Intelligent SLO Fulfilment and Service Management. It specifically implements the API in the Media streaming use case.
 
 It also includes some additional files for development, deployment, and testing.
 
